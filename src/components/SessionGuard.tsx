@@ -61,6 +61,7 @@ export const SessionGuard: React.FC<SessionGuardProps> = ({
         if (requireSession) {
           navigate('/');
         }
+        setHasSession(false);
       } finally {
         setIsValidating(false);
       }
