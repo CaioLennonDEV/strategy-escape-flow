@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./pages/Index";
 import PillarsPage from "./pages/Pillars";
+import PillarPage from "./pages/PillarPage";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
@@ -20,6 +21,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/pillars" element={<PillarsPage />} />
+            <Route path="/pilar/:pillarId" element={<PillarPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
