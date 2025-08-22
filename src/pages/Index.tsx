@@ -9,12 +9,13 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Rocket, Shield, Users, Target } from 'lucide-react';
 import { SessionGuard } from '@/components/SessionGuard';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import type { LoginForm } from '@/lib/types';
 import { formatSessionCode, formatNickname } from '@/lib/formatters';
 
 const Index = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [formData, setFormData] = React.useState<LoginForm>({
     code: '',
     nickname: ''
@@ -45,27 +46,45 @@ const Index = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Verificar se o código existe e está ativo
+      const { data: meetingCode, error: codeError } = await supabase
+        .from('meeting_codes')
+        .select('meeting_id, is_active')
+        .eq('code', formData.code.toUpperCase())
+        .eq('is_active', true)
+        .single();
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Erro ao iniciar sessão');
+      if (codeError || !meetingCode) {
+        setError('Código inválido ou inativo');
+        return;
       }
 
-      // Salvar nickname no localStorage
+      // Criar nova sessão
+      const { data: session, error: sessionError } = await supabase
+        .from('sessions')
+        .insert({
+          meeting_id: meetingCode.meeting_id,
+          code: formData.code.toUpperCase(),
+          nickname: formData.nickname.trim()
+        })
+        .select()
+        .single();
+
+      if (sessionError) {
+        console.error('Erro ao criar sessão:', sessionError);
+        setError('Erro interno do servidor');
+        return;
+      }
+
+      // Salvar dados no localStorage
+      localStorage.setItem('session_id', session.id);
       localStorage.setItem('nickname', formData.nickname);
       
       // Redirecionar para o grid de pilares
-      router.push('/pillars');
+      navigate('/pillars');
 
     } catch (err) {
+      console.error('Erro no login:', err);
       setError(err instanceof Error ? err.message : 'Erro inesperado');
     } finally {
       setIsLoading(false);

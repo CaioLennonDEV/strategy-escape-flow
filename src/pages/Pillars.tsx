@@ -2,17 +2,18 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { SessionGuard } from '@/components/SessionGuard';
 import { DoorCard } from '@/components/DoorCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Users, Clock, Target } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import type { Pillar } from '@/lib/types';
 
 const PillarsPage = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [pillars, setPillars] = React.useState<(Pillar & { isCompleted: boolean })[]>([]);
   const [nickname, setNickname] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
@@ -20,11 +21,45 @@ const PillarsPage = () => {
   React.useEffect(() => {
     const loadPillars = async () => {
       try {
-        const response = await fetch('/api/pillars');
-        if (response.ok) {
-          const data = await response.json();
-          setPillars(data.pillars);
+        const sessionId = localStorage.getItem('session_id');
+        
+        if (!sessionId) {
+          navigate('/');
+          return;
         }
+
+        // Buscar pilares
+        const { data: pillarsData, error: pillarsError } = await supabase
+          .from('pillars')
+          .select('*')
+          .order('name');
+
+        if (pillarsError) {
+          console.error('Erro ao buscar pilares:', pillarsError);
+          return;
+        }
+
+        // Buscar status de completamento dos pilares para esta sessão
+        const { data: sessionPillars, error: sessionError } = await supabase
+          .from('session_pillars')
+          .select('pillar_id, is_completed, completed_at')
+          .eq('session_id', sessionId);
+
+        if (sessionError) {
+          console.error('Erro ao buscar status dos pilares:', sessionError);
+        }
+
+        // Combinar dados
+        const pillarsWithStatus = pillarsData.map(pillar => {
+          const status = sessionPillars?.find(sp => sp.pillar_id === pillar.id);
+          return {
+            ...pillar,
+            isCompleted: status?.is_completed || false,
+            completedAt: status?.completed_at
+          };
+        });
+
+        setPillars(pillarsWithStatus);
       } catch (error) {
         console.error('Erro ao carregar pilares:', error);
       } finally {
@@ -39,10 +74,10 @@ const PillarsPage = () => {
     }
 
     loadPillars();
-  }, []);
+  }, [navigate]);
 
   const handlePillarClick = (pillarId: string) => {
-    router.push(`/pilar/${pillarId}`);
+    navigate(`/pilar/${pillarId}`);
   };
 
   const completedCount = pillars.filter(p => p.isCompleted).length;

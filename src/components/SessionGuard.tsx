@@ -2,7 +2,8 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SessionGuardProps {
   children: React.ReactNode;
@@ -13,35 +14,52 @@ export const SessionGuard: React.FC<SessionGuardProps> = ({
   children,
   requireSession = true
 }) => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [isValidating, setIsValidating] = React.useState(true);
   const [hasSession, setHasSession] = React.useState(false);
 
   React.useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('/api/session/validate');
-        const isValid = response.ok;
+        const sessionId = localStorage.getItem('session_id');
         
-        setHasSession(isValid);
-        
-        if (requireSession && !isValid) {
-          router.push('/');
-          return;
-        }
-        
-        if (!requireSession && isValid) {
-          // Se está na página inicial mas já tem sessão, redirecionar para o dashboard
-          const nickname = localStorage.getItem('nickname');
-          if (nickname) {
-            router.push('/pillars');
+        if (!sessionId) {
+          setHasSession(false);
+          if (requireSession) {
+            navigate('/');
             return;
+          }
+        } else {
+          // Verificar se a sessão existe no Supabase
+          const { data: session, error } = await supabase
+            .from('sessions')
+            .select('id, nickname, meeting_id')
+            .eq('id', sessionId)
+            .single();
+
+          const isValid = !error && session;
+          setHasSession(isValid);
+          
+          if (requireSession && !isValid) {
+            localStorage.removeItem('session_id');
+            localStorage.removeItem('nickname');
+            navigate('/');
+            return;
+          }
+          
+          if (!requireSession && isValid) {
+            // Se está na página inicial mas já tem sessão, redirecionar para o dashboard
+            const nickname = localStorage.getItem('nickname');
+            if (nickname) {
+              navigate('/pillars');
+              return;
+            }
           }
         }
       } catch (error) {
         console.error('Erro ao validar sessão:', error);
         if (requireSession) {
-          router.push('/');
+          navigate('/');
         }
       } finally {
         setIsValidating(false);
@@ -49,7 +67,7 @@ export const SessionGuard: React.FC<SessionGuardProps> = ({
     };
 
     checkSession();
-  }, [requireSession, router]);
+  }, [requireSession, navigate]);
 
   if (isValidating) {
     return (
