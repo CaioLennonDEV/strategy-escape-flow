@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MissionConsole } from '@/components/MissionConsole';
+import { ConfessionalScreen } from '@/components/ConfessionalScreen';
 import type { Pillar, Action } from '@/lib/types';
 
 const PillarPage = () => {
@@ -16,6 +17,8 @@ const PillarPage = () => {
   const [pillar, setPillar] = React.useState<Pillar | null>(null);
   const [actions, setActions] = React.useState<Action[]>([]);
   const [isCompleted, setIsCompleted] = React.useState(false);
+  const [showConfessional, setShowConfessional] = React.useState(false);
+  const [topAction, setTopAction] = React.useState<Action | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -66,9 +69,26 @@ const PillarPage = () => {
           console.error('Erro ao buscar status do pilar:', sessionError);
         }
 
+        // Buscar ranking para determinar a ação #1
+        const { data: prioritiesData } = await supabase
+          .from('user_priorities')
+          .select('action_id, rank')
+          .eq('session_id', sessionId)
+          .in('action_id', actionsData?.map(a => a.id) || [])
+          .order('rank');
+
+        let firstAction = null;
+        if (prioritiesData && prioritiesData.length > 0) {
+          const topPriority = prioritiesData.find(p => p.rank === 1);
+          if (topPriority && actionsData) {
+            firstAction = actionsData.find(a => a.id === topPriority.action_id) || null;
+          }
+        }
+
         setPillar(pillarData);
         setActions(actionsData || []);
         setIsCompleted(sessionPillar?.is_completed || false);
+        setTopAction(firstAction);
       } catch (error) {
         console.error('Erro ao carregar dados do pilar:', error);
         navigate('/pillars');
@@ -90,6 +110,7 @@ const PillarPage = () => {
       
       if (!sessionId || !pillarId) return;
 
+      // Marcar pilar como completo
       const { error } = await supabase
         .from('session_pillars')
         .upsert({
@@ -105,9 +126,30 @@ const PillarPage = () => {
       }
 
       setIsCompleted(true);
+      
+      // Buscar a ação #1 do ranking para o confessionário
+      const { data: prioritiesData } = await supabase
+        .from('user_priorities')
+        .select('action_id, rank')
+        .eq('session_id', sessionId)
+        .in('action_id', actions.map(a => a.id))
+        .order('rank')
+        .limit(1);
+
+      if (prioritiesData && prioritiesData.length > 0) {
+        const topPriorityAction = actions.find(a => a.id === prioritiesData[0].action_id);
+        if (topPriorityAction) {
+          setTopAction(topPriorityAction);
+          setShowConfessional(true);
+        }
+      }
     } catch (error) {
       console.error('Erro ao completar pilar:', error);
     }
+  };
+
+  const handleConfessionalComplete = () => {
+    navigate('/pillars');
   };
 
   if (isLoading) {
@@ -135,6 +177,19 @@ const PillarPage = () => {
             </Button>
           </div>
         </div>
+      </SessionGuard>
+    );
+  }
+
+  // Se o confessionário deve ser mostrado
+  if (showConfessional && topAction) {
+    return (
+      <SessionGuard>
+        <ConfessionalScreen
+          pillar={pillar}
+          topAction={topAction}
+          onComplete={handleConfessionalComplete}
+        />
       </SessionGuard>
     );
   }
