@@ -37,7 +37,7 @@ export const SessionGuard: React.FC<SessionGuardProps> = ({
             .eq('id', sessionId)
             .maybeSingle();
 
-          const isValid = !error && session;
+          const isValid = !error && session !== null;
           setHasSession(isValid);
           
           if (requireSession && !isValid) {
