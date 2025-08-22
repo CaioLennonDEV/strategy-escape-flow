@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Index from "./pages/Index";
 import PillarsPage from "./pages/Pillars";
 import PillarPage from "./pages/PillarPage";
+import Achievement from "./pages/Achievement";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 
@@ -22,6 +23,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/pillars" element={<PillarsPage />} />
             <Route path="/pilar/:pillarId" element={<PillarPage />} />
+            <Route path="/achievement" element={<Achievement />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

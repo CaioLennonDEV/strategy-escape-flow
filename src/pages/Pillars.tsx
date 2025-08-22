@@ -7,8 +7,9 @@ import { SessionGuard } from '@/components/SessionGuard';
 import { DoorCard } from '@/components/DoorCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Users, Clock, Target } from 'lucide-react';
+import { Users, Clock, Target, Trophy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Pillar } from '@/lib/types';
 
@@ -80,8 +81,13 @@ const PillarsPage = () => {
     navigate(`/pilar/${pillarId}`);
   };
 
+  const handleViewAchievement = () => {
+    navigate('/achievement');
+  };
+
   const completedCount = pillars.filter(p => p.isCompleted).length;
   const progressPercentage = pillars.length > 0 ? (completedCount / pillars.length) * 100 : 0;
+  const allCompleted = completedCount === pillars.length && pillars.length > 0;
 
   if (isLoading) {
     return (
@@ -129,7 +135,7 @@ const PillarsPage = () => {
                   </div>
                   <Progress value={progressPercentage} className="h-3" />
                   <p className="text-xs text-slate-600">
-                    {completedCount === pillars.length 
+                    {allCompleted 
                       ? 'Missão concluída! 🎉' 
                       : `${pillars.length - completedCount} pilares restantes`
                     }
@@ -181,25 +187,36 @@ const PillarsPage = () => {
             ))}
           </div>
 
-          {/* Ações Rápidas */}
-          {completedCount === pillars.length && (
+          {/* Ações Rápidas - Missão Concluída */}
+          {allCompleted && (
             <Card className="mission-card border-green-200 bg-green-50">
               <CardContent className="text-center py-8">
-                <div className="space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-                    <Target className="w-8 h-8 text-green-600" />
+                <div className="space-y-6">
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+                    <Trophy className="w-10 h-10 text-green-600" />
                   </div>
                   <div>
-                    <h3 className="font-poppins font-semibold text-lg text-green-800">
+                    <h2 className="font-poppins font-bold text-2xl text-green-800 mb-2">
                       Missão Concluída!
-                    </h3>
-                    <p className="text-green-700 mt-2">
+                    </h2>
+                    <p className="text-green-700 text-lg">
                       Parabéns! Você completou todos os pilares da jornada estratégica.
                     </p>
                   </div>
-                  <Badge className="mission-status completed">
-                    Todas as etapas concluídas
-                  </Badge>
+                  <div className="space-y-4">
+                    <Badge className="mission-status completed text-base px-4 py-2">
+                      Todas as etapas concluídas
+                    </Badge>
+                    <div>
+                      <Button
+                        onClick={handleViewAchievement}
+                        className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Trophy className="w-5 h-5 mr-2" />
+                        Ver Minha Conquista
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
