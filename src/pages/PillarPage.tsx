@@ -5,7 +5,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SessionGuard } from '@/components/SessionGuard';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Zap, Target, Timer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MissionConsole } from '@/components/MissionConsole';
 import { ConfessionalScreen } from '@/components/ConfessionalScreen';
@@ -155,10 +155,30 @@ const PillarPage = () => {
   if (isLoading) {
     return (
       <SessionGuard>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="w-8 h-8 border-4 border-unimed-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="text-slate-600">Carregando pilar...</p>
+        <div className="min-h-screen escape-run-body relative overflow-hidden">
+          {/* Floating Elements */}
+          <div className="floating-elements">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="floating-element"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 8}s`,
+                  animationDuration: `${6 + Math.random() * 4}s`,
+                  width: `${4 + Math.random() * 8}px`,
+                  height: `${4 + Math.random() * 8}px`
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center min-h-screen relative z-10">
+            <div className="text-center space-y-3 sm:space-y-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="text-white/90 font-medium text-sm sm:text-base">Carregando pilar...</p>
+            </div>
           </div>
         </div>
       </SessionGuard>
@@ -168,13 +188,33 @@ const PillarPage = () => {
   if (!pillar) {
     return (
       <SessionGuard>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <p className="text-slate-600">Pilar não encontrado</p>
-            <Button onClick={handleBack} variant="outline">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar para Centro de Comando
-            </Button>
+        <div className="min-h-screen escape-run-body relative overflow-hidden">
+          {/* Floating Elements */}
+          <div className="floating-elements">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="floating-element"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 8}s`,
+                  animationDuration: `${6 + Math.random() * 4}s`,
+                  width: `${4 + Math.random() * 8}px`,
+                  height: `${4 + Math.random() * 8}px`
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="flex items-center justify-center min-h-screen relative z-10">
+            <div className="text-center space-y-3 sm:space-y-4">
+              <p className="text-white/90 font-medium text-sm sm:text-base">Pilar não encontrado</p>
+              <Button onClick={handleBack} className="escape-run-button text-sm sm:text-base">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar para Centro de Comando
+              </Button>
+            </div>
           </div>
         </div>
       </SessionGuard>
@@ -196,23 +236,45 @@ const PillarPage = () => {
 
   return (
     <SessionGuard>
-      <div className="min-h-screen p-4">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header */}
-          <div className="flex items-center gap-4">
-            <Button onClick={handleBack} variant="outline" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Voltar
-            </Button>
-          </div>
+      <div className="min-h-screen escape-run-body relative overflow-hidden">
+        {/* Floating Elements */}
+        <div className="floating-elements">
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="floating-element"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+                animationDuration: `${6 + Math.random() * 4}s`,
+                width: `${4 + Math.random() * 8}px`,
+                height: `${4 + Math.random() * 8}px`
+              }}
+            />
+          ))}
+        </div>
 
-          {/* Mission Console */}
-          <MissionConsole
-            pillar={pillar}
-            actions={actions}
-            onComplete={handleComplete}
-            isCompleted={isCompleted}
-          />
+        <div className="p-3 sm:p-4 relative z-10">
+          <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+            {/* Header */}
+            <div className="flex items-center gap-3 sm:gap-4 entrance-animation">
+              <Button onClick={handleBack} className="escape-run-button text-sm sm:text-base">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar ao Centro de Comando
+              </Button>
+            </div>
+
+            {/* Mission Console */}
+            <div className="entrance-animation stagger-1">
+              <MissionConsole
+                pillar={pillar}
+                actions={actions}
+                onComplete={handleComplete}
+                isCompleted={isCompleted}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </SessionGuard>

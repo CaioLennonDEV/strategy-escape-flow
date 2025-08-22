@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { SessionGuard } from '@/components/SessionGuard';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Download, Share2, ArrowLeft, Trophy } from 'lucide-react';
+import { Download, Share2, ArrowLeft, Trophy, Zap, Star, Award } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const AchievementPage = () => {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ const AchievementPage = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [nickname, setNickname] = React.useState('');
+  const [isInteracting, setIsInteracting] = useState(false);
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     // Carregar nickname do localStorage
@@ -23,8 +26,9 @@ const AchievementPage = () => {
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isMobile) return;
 
+    setIsInteracting(true);
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -35,9 +39,32 @@ const AchievementPage = () => {
     setRotation({ x: rotateX, y: rotateY });
   };
 
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!cardRef.current || !isMobile) return;
+
+    setIsInteracting(true);
+    const touch = e.touches[0];
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    const rotateX = (touch.clientY - centerY) / 8;
+    const rotateY = (centerX - touch.clientX) / 8;
+    
+    setRotation({ x: rotateX, y: rotateY });
+  };
+
   const handleMouseLeave = () => {
     setIsHovered(false);
+    setIsInteracting(false);
     setRotation({ x: 0, y: 0 });
+  };
+
+  const handleTouchEnd = () => {
+    if (isMobile) {
+      setIsInteracting(false);
+      setRotation({ x: 0, y: 0 });
+    }
   };
 
   const handleSaveImage = async () => {
@@ -95,48 +122,70 @@ const AchievementPage = () => {
 
   return (
     <SessionGuard>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-green-900 p-4 flex flex-col items-center justify-center">
-        {/* Background Effects */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-unimed-primary/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-unimed-light/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-unimed-orange/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      <div className="min-h-screen escape-run-body relative overflow-hidden">
+        {/* Floating Elements - Reduzido para mobile */}
+        <div className={`floating-elements ${isInteracting ? 'paused' : ''}`}>
+          {[...Array(isMobile ? 8 : 15)].map((_, i) => (
+            <div
+              key={i}
+              className="floating-element"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+                animationDuration: `${isMobile ? 8 + Math.random() * 6 : 6 + Math.random() * 4}s`,
+                width: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`,
+                height: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`
+              }}
+            />
+          ))}
         </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto space-y-8">
+        
+        <div className="relative z-10 max-w-4xl mx-auto space-y-4 sm:space-y-6 md:space-y-8 p-3 sm:p-4 flex flex-col items-center justify-center min-h-screen">
           {/* Header */}
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 entrance-animation">
             <Button
-              variant="ghost"
               onClick={() => navigate('/pillars')}
-              className="text-white hover:text-unimed-primary mb-4"
+              className="escape-run-button mb-3 sm:mb-4 text-sm sm:text-base"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Centro de Comando
             </Button>
+            <p></p>
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-unimed-primary to-unimed-light text-white text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4 md:mb-6 pulse-glow">
+              <Award className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12" />
+            </div>
             
-            <h1 className="font-poppins font-bold text-4xl md:text-6xl text-white text-glow">
-              Conquista Desbloqueada!
+            <h1 className="font-poppins font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl text-white text-glow px-3 sm:px-4 leading-tight">
+              CONQUISTA DESBLOQUEADA!
             </h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto font-medium px-3 sm:px-4 leading-relaxed">
               {nickname}, sua jornada estratégica foi concluída com sucesso!
             </p>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 sm:gap-3 md:gap-6 text-white/80">
+              <div className="flex items-center gap-2">
+                <Star className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+                <span className="text-xs sm:text-sm md:text-lg">Missão Completa</span>
+              </div>
+            </div>
           </div>
 
           {/* 3D Card */}
-          <div className="flex justify-center">
+          <div className="flex justify-center entrance-animation stagger-1">
             <div
               ref={cardRef}
-              className="relative preserve-3d cursor-pointer"
+              className="relative preserve-3d cursor-pointer touch-manipulation"
               style={{
                 transform: `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
                 transition: isHovered ? 'none' : 'transform 0.3s ease-out',
               }}
               onMouseMove={handleMouseMove}
-              onMouseEnter={() => setIsHovered(true)}
+              onMouseEnter={() => !isMobile && setIsHovered(true)}
               onMouseLeave={handleMouseLeave}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
-              <Card className="w-96 h-64 relative overflow-hidden border-0 shadow-2xl">
+              <Card className="w-72 h-48 sm:w-80 sm:h-52 md:w-96 md:h-64 relative overflow-hidden border-0 shadow-2xl">
                 {/* Card Background with Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-unimed-primary via-unimed-light to-unimed-dark">
                   {/* Geometric Pattern Overlay */}
@@ -156,25 +205,25 @@ const AchievementPage = () => {
                 </div>
 
                 {/* Card Content */}
-                <div className="relative z-10 h-full flex flex-col items-center justify-center p-6 text-center">
+                <div className="relative z-10 h-full flex flex-col items-center justify-center p-3 sm:p-4 md:p-6 text-center">
                   {/* Trophy Icon */}
-                  <div className="mb-4">
-                    <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                      <Trophy className="w-8 h-8 text-white" />
+                  <div className="mb-2 sm:mb-3 md:mb-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                      <Trophy className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-white" />
                     </div>
                   </div>
 
                   {/* Main Text */}
-                  <h2 className="font-poppins font-bold text-2xl text-white mb-2 leading-tight">
+                  <h2 className="font-poppins font-bold text-sm sm:text-lg md:text-2xl text-white mb-1 sm:mb-2 leading-tight">
                     Missão Concluída!
                   </h2>
-                  <p className="text-white/90 text-sm leading-relaxed">
+                  <p className="text-white/90 text-xs sm:text-xs md:text-sm leading-relaxed">
                     Completei a Jornada Estratégica<br />
                     e ganhei esse cartão :D
                   </p>
 
                   {/* Agent Badge */}
-                  <div className="mt-4 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
+                  <div className="mt-2 sm:mt-3 md:mt-4 px-2 md:px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
                     <span className="text-white/90 text-xs font-medium">
                       Agente {nickname}
                     </span>
@@ -206,28 +255,27 @@ const AchievementPage = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center entrance-animation stagger-2">
             <Button
               onClick={handleSaveImage}
-              className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
-              variant="ghost"
+              className="escape-run-button text-sm sm:text-base"
             >
-              <Download className="w-5 h-5 mr-2" />
+              <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Salvar Imagem
             </Button>
             
             <Button
               onClick={handleShare}
-              className="bg-unimed-primary hover:bg-unimed-primary/90 text-white px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105 shadow-lg"
+              className="escape-run-button text-sm sm:text-base"
             >
-              <Share2 className="w-5 h-5 mr-2" />
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Compartilhar
             </Button>
           </div>
 
           {/* Additional Info */}
-          <div className="text-center">
-            <p className="text-white/60 text-sm">
+          <div className="text-center entrance-animation stagger-3">
+            <p className="text-white/70 text-sm sm:text-base md:text-lg font-medium leading-relaxed">
               Parabéns por completar todos os pilares da jornada estratégica!
             </p>
           </div>

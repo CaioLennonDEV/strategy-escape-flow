@@ -18,7 +18,14 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Router>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={
+          <div className="min-h-screen escape-run-body flex items-center justify-center">
+            <div className="text-center space-y-4">
+              <div className="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <p className="text-white/90 font-medium">Carregando aplicação...</p>
+            </div>
+          </div>
+        }>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/pillars" element={<PillarsPage />} />

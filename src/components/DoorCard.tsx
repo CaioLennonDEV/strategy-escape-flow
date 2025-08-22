@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Lock, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Lock, ArrowRight, Zap, Star } from 'lucide-react';
 import type { Pillar } from '@/lib/types';
 import { formatMissionStatus } from '@/lib/formatters';
 
@@ -34,41 +34,41 @@ export const DoorCard: React.FC<DoorCardProps> = ({
 
   return (
     <Card 
-      className={`door-card group cursor-pointer transition-all duration-300 hover:scale-105 ${className}`}
+      className={`escape-run-card group cursor-pointer transition-all duration-300 hover:scale-105 ${className}`}
       onClick={!isLocked ? onClick : undefined}
       style={{
         backgroundColor: `${pillar.color}08`,
         borderColor: isCompleted ? '#22c55e' : `${pillar.color}40`
       }}
     >
-      <CardContent className="p-6 relative">
+      <CardContent className="p-3 sm:p-4 md:p-6 relative">
         {/* LED Indicator */}
-        <div className="absolute top-4 right-4 flex items-center gap-2">
+        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 flex items-center gap-1 sm:gap-2">
           <div className={`led-indicator ${isCompleted ? 'completed' : 'active'}`} />
           {isCompleted && (
             <CheckCircle2 className="w-4 h-4 text-green-500" />
           )}
           {isLocked && (
-            <Lock className="w-4 h-4 text-slate-400" />
+            <Lock className="w-4 h-4 text-white/60" />
           )}
         </div>
 
         {/* Icon */}
         <div 
-          className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl mb-4 glow-effect"
+          className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center text-2xl sm:text-2xl md:text-3xl mb-3 sm:mb-4 glow-effect"
           style={{ backgroundColor: `${pillar.color}15` }}
         >
           {displayIcon}
         </div>
 
         {/* Content */}
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           <div>
-            <h3 className="font-poppins font-semibold text-lg text-slate-800 group-hover:text-slate-900">
+            <h3 className="font-poppins font-semibold text-sm sm:text-base md:text-lg text-white group-hover:text-white/90 leading-tight">
               {pillar.name}
             </h3>
             {pillar.description && (
-              <p className="text-sm text-slate-600 mt-1 line-clamp-2">
+              <p className="text-xs sm:text-sm text-white/80 mt-1 line-clamp-2 leading-relaxed">
                 {pillar.description}
               </p>
             )}
@@ -76,12 +76,12 @@ export const DoorCard: React.FC<DoorCardProps> = ({
 
           {/* Status Badge */}
           <div className="flex items-center justify-between">
-            <Badge className={`mission-status ${status.variant}`}>
+            <Badge className={`mission-status text-xs sm:text-xs ${status.variant}`}>
               {status.label}
             </Badge>
 
             {!isLocked && (
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-unimed-primary transition-colors" />
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-white/60 group-hover:text-unimed-primary transition-colors" />
             )}
           </div>
         </div>

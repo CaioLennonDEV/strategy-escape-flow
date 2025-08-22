@@ -4,9 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Target, CheckCircle2, GripVertical } from 'lucide-react';
+import { Trophy, Target, CheckCircle2, ArrowUpDown, Zap, Star, Timer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useQuickOrdering } from '@/hooks/use-quick-ordering';
+import { useReorderAnimation } from '@/hooks/use-reorder-animation';
+import { QuickActions } from '@/components/ui/quick-actions';
+import { getItemColor, getItemGradient, getItemBorderColor } from '@/lib/color-utils';
 import type { Action, Pillar } from '@/lib/types';
 
 interface MissionConsoleProps {
@@ -25,39 +30,34 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   className = ''
 }) => {
   const [progress, setProgress] = React.useState(0);
-  const [actionRanking, setActionRanking] = React.useState<Action[]>(actions);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
-
-  React.useEffect(() => {
-    setActionRanking(actions);
-  }, [actions]);
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     const timer = setTimeout(() => setProgress(isCompleted ? 100 : 45), 100);
     return () => clearTimeout(timer);
   }, [isCompleted]);
 
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData('text/plain', index.toString());
-  };
+  // Hook para animação de reordenação
+  const { triggerAnimation, isAnimating } = useReorderAnimation();
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
-    e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
-    
-    if (dragIndex !== dropIndex) {
-      const newRanking = [...actionRanking];
-      const draggedAction = newRanking[dragIndex];
-      newRanking.splice(dragIndex, 1);
-      newRanking.splice(dropIndex, 0, draggedAction);
-      setActionRanking(newRanking);
+  // Hook para ordenação com botões
+  const {
+    orderedItems: actionRanking,
+    moveItem,
+    canMoveUp,
+    canMoveDown,
+    getItemPosition
+  } = useQuickOrdering({
+    items: actions,
+    onReorder: (newItems) => {
+      // Callback opcional para quando a ordem muda
+    },
+    onItemMove: (itemId, fromPosition, toPosition, direction, affectedItems) => {
+      triggerAnimation(itemId, fromPosition, toPosition, direction, affectedItems);
     }
-  };
+  });
 
   const saveRankingAndComplete = async () => {
     try {
@@ -113,86 +113,112 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   };
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-4 sm:space-y-6 ${className}`}>
       {/* Header da Missão */}
-      <Card className="mission-card">
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+      <Card className="escape-run-card">
+        <CardHeader className="pb-3 sm:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div 
-                className="w-12 h-12 rounded-lg flex items-center justify-center text-xl"
-                style={{ backgroundColor: `${pillar.color}15` }}
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-unimed-primary to-unimed-light flex items-center justify-center text-lg sm:text-xl"
+                style={{ 
+                  background: `linear-gradient(135deg, ${pillar.color}15 0%, ${pillar.color}30 100%)`
+                }}
               >
-                <Target className="w-6 h-6" style={{ color: pillar.color }} />
+                <Target className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div>
-                <CardTitle className="font-poppins text-xl">{pillar.name}</CardTitle>
-                <p className="text-sm text-slate-600 mt-1">{pillar.description}</p>
+                <CardTitle className="font-poppins text-lg sm:text-xl md:text-2xl text-white leading-tight">🎯 {pillar.name}</CardTitle>
+                <p className="text-xs sm:text-sm text-white/80 mt-1 font-medium leading-relaxed">{pillar.description}</p>
               </div>
             </div>
             
             {isCompleted && (
-              <Badge className="mission-status completed">
-                <CheckCircle2 className="w-3 h-3 mr-1" />
-                Concluído
+              <Badge className="bg-unimed-primary text-white font-bold px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">
+                <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                MISSÃO CONCLUÍDA
               </Badge>
             )}
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-slate-700">Progresso da Missão</span>
-              <span className="text-sm text-slate-500">{Math.round(progress)}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
           </div>
         </CardHeader>
       </Card>
 
       {/* Console de Priorização */}
-      <Card className="mission-card">
+      <Card className="escape-run-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 terminal-font text-lg">
-            <Trophy className="w-5 h-5 text-unimed-orange" />
-            Ranking de Prioridades
+          <CardTitle className="flex items-center gap-2 text-white text-lg sm:text-xl">
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-unimed-orange" />
+            RANKING DE PRIORIDADES
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="bg-slate-50 rounded-lg p-4">
-            <h4 className="font-medium text-slate-800 mb-3">Arraste para priorizar as ações:</h4>
-            <div className="space-y-2">
-              {actionRanking.map((action, index) => (
-                <div 
-                  key={action.id}
-                  className="bg-white p-3 rounded border-l-4 cursor-move hover:shadow-md transition-shadow flex items-center gap-3"
-                  style={{ borderLeftColor: pillar.color }}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, index)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, index)}
-                >
-                  <GripVertical className="w-4 h-4 text-slate-400" />
-                  <div className="flex-1">
-                    <h5 className="font-medium text-sm">{action.title}</h5>
-                    {action.description && (
-                      <p className="text-xs text-slate-600 mt-1">{action.description}</p>
-                    )}
+          <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-unimed-support/5 to-unimed-info/5 border border-unimed-support/20">
+            <h4 className="font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
+              <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
+              Use os botões para reorganizar as ações:
+            </h4>
+            <div className="space-y-2 sm:space-y-3">
+              {actionRanking.map((action, index) => {
+                const currentPosition = getItemPosition(action.id);
+                const itemColor = getItemColor(action.id);
+                
+                return (
+                  <div 
+                    key={action.id}
+                    className={`backdrop-blur-sm p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 flex items-center gap-3 sm:gap-4 unique-color-item ${
+                      isAnimating(action.id) ? 'item-reordering' : ''
+                    }`}
+                    style={{ 
+                      background: getItemGradient(itemColor),
+                      borderColor: getItemBorderColor(itemColor)
+                    }}
+                  >
+
+                    
+                    <div 
+                      className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${itemColor} 0%, ${itemColor}80 100%)`
+                      }}
+                    >
+                      <ArrowUpDown className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-bold text-xs sm:text-sm text-slate-800 leading-tight">{action.title}</h5>
+                      {action.description && (
+                        <p className="text-xs text-slate-600 mt-1 font-medium leading-relaxed">{action.description}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge 
+                        className="text-white font-bold px-2 py-1 sm:px-3 text-xs"
+                        style={{ 
+                          backgroundColor: itemColor,
+                          borderColor: itemColor
+                        }}
+                      >
+                        {currentPosition}º
+                      </Badge>
+                      <QuickActions
+                        onMoveUp={() => moveItem(action.id, 'up')}
+                        onMoveDown={() => moveItem(action.id, 'down')}
+                        canMoveUp={canMoveUp(action.id)}
+                        canMoveDown={canMoveDown(action.id)}
+                        disabled={isCompleted}
+                      />
+                    </div>
                   </div>
-                  <Badge variant="secondary">
-                    {index + 1}º
-                  </Badge>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end mt-6 pt-4 border-t">
+          <div className="flex justify-end mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-unimed-support/30">
             <Button 
               onClick={saveRankingAndComplete}
               disabled={isCompleted || isSubmitting}
-              className="bg-unimed-primary hover:bg-unimed-primary/90"
+              className="escape-run-button text-sm sm:text-base"
             >
               {isSubmitting ? 'Finalizando...' : isCompleted ? 'Pilar Concluído' : 'Concluir Pilar'}
             </Button>

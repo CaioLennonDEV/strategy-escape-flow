@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Rocket, Shield, Users, Target } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Rocket, Shield, Users, Target, Zap, Trophy, Star, Timer } from 'lucide-react';
 import { SessionGuard } from '@/components/SessionGuard';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -93,117 +94,129 @@ const Index = () => {
 
   return (
     <SessionGuard requireSession={false}>
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-4xl">
-          {/* Hero Section */}
-          <div className="text-center mb-12 space-y-6">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-unimed-primary to-unimed-light text-white text-3xl mb-6 animate-glow-pulse">
-              <Rocket className="w-10 h-10" />
-            </div>
-            
-            <div className="space-y-4">
-              <h1 className="font-poppins font-bold text-4xl md:text-5xl text-slate-800 text-glow">
-                Jornada da Estratégia
-              </h1>
-              <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-                Uma experiência colaborativa e futurista para definir as prioridades estratégicas da sua equipe
-              </p>
-            </div>
+      <div className="min-h-screen escape-run-body relative overflow-hidden">
+        {/* Floating Elements */}
+        <div className="floating-elements">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="floating-element"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+                animationDuration: `${6 + Math.random() * 4}s`,
+                width: `${4 + Math.random() * 8}px`,
+                height: `${4 + Math.random() * 8}px`
+              }}
+            />
+          ))}
+        </div>
 
-            {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto mt-8">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 backdrop-blur">
-                <Shield className="w-5 h-5 text-unimed-primary" />
-                <span className="text-sm font-medium text-slate-700">Ambiente Seguro</span>
+        <div className="flex items-center justify-center p-3 sm:p-4 min-h-screen">
+          <div className="w-full max-w-6xl">
+            {/* Hero Section */}
+            <div className="mission-header">
+              <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-gradient-to-br from-unimed-primary to-unimed-light text-white text-2xl sm:text-3xl mb-4 sm:mb-6 mission-pulse">
+                <Zap className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
               </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 backdrop-blur">
-                <Users className="w-5 h-5 text-unimed-light" />
-                <span className="text-sm font-medium text-slate-700">Colaborativo</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white/60 backdrop-blur">
-                <Target className="w-5 h-5 text-unimed-orange" />
-                <span className="text-sm font-medium text-slate-700">Resultados Práticos</span>
+              
+              <div className="space-y-4 sm:space-y-6">
+                <h1 className="font-poppins font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white text-glow leading-tight">
+                  ESCAPE RUN
+                </h1>
+                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed">
+                  Jornada da Estratégia • Missão Colaborativa
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* Login Form */}
-          <Card className="mission-card max-w-md mx-auto">
-            <CardHeader className="text-center pb-6">
-              <CardTitle className="font-poppins text-2xl">Iniciar Missão</CardTitle>
-              <p className="text-sm text-slate-600">
-                Insira suas credenciais para acessar a jornada estratégica
-              </p>
-            </CardHeader>
-            
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
-                    {error}
-                  </div>
-                )}
+            {/* Main Content Grid */}
+            <div className="grid max-w-5xl mx-auto">
+              {/* Login Form */}
+              <div className="md:col-span-2 entrance-animation stagger-1">
+                <Card className="escape-run-card">
+                  <CardHeader className="text-center pb-4 sm:pb-6">
+                    <CardTitle className="font-poppins text-xl sm:text-2xl md:text-3xl text-white leading-tight">
+                      🚀 INICIAR MISSÃO
+                    </CardTitle>
+                    <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+                      Insira suas credenciais para acessar a jornada estratégica
+                    </p>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                      {error && (
+                        <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 text-sm">
+                          ⚠️ {error}
+                        </div>
+                      )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="code" className="text-sm font-medium">
-                    Código de Acesso
-                  </Label>
-                  <Input
-                    id="code"
-                    type="text"
-                    placeholder="Digite o código da missão"
-                    value={formData.code}
-                    onChange={handleInputChange('code')}
-                    className="terminal-font text-center text-lg tracking-wider"
-                    maxLength={10}
-                  />
-                </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <Label htmlFor="code" className="text-xs sm:text-sm font-semibold text-white/90">
+                          🔑 CÓDIGO DE ACESSO
+                        </Label>
+                        <Input
+                          id="code"
+                          type="text"
+                          placeholder="Digite o código da missão"
+                          value={formData.code}
+                          onChange={handleInputChange('code')}
+                          className="escape-run-input terminal-font text-center text-base sm:text-lg tracking-wider h-12 sm:h-14"
+                          maxLength={10}
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="nickname" className="text-sm font-medium">
-                    Nome do Agente
-                  </Label>
-                  <Input
-                    id="nickname"
-                    type="text"
-                    placeholder="Como você quer ser chamado?"
-                    value={formData.nickname}
-                    onChange={handleInputChange('nickname')}
-                    maxLength={30}
-                  />
-                </div>
+                      <div className="space-y-2 sm:space-y-3">
+                        <Label htmlFor="nickname" className="text-xs sm:text-sm font-semibold text-white/90">
+                          👤 NOME DO AGENTE
+                        </Label>
+                        <Input
+                          id="nickname"
+                          type="text"
+                          placeholder="Como você quer ser chamado?"
+                          value={formData.nickname}
+                          onChange={handleInputChange('nickname')}
+                          className="escape-run-input h-12 sm:h-14"
+                          maxLength={30}
+                        />
+                      </div>
 
-                <Button
-                  type="submit"
-                  disabled={isLoading || !formData.code || !formData.nickname}
-                  className="w-full bg-unimed-primary hover:bg-unimed-primary/90 text-white font-medium py-3 text-base"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Acessando...
+                      <Button
+                        type="submit"
+                        disabled={isLoading || !formData.code || !formData.nickname}
+                        className="escape-run-button w-full h-12 sm:h-14 text-white font-bold text-sm sm:text-base md:text-lg"
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>ACESSANDO...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <Rocket className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span>ENTRAR NA JORNADA</span>
+                          </div>
+                        )}
+                      </Button>
+                    </form>
+
+                    {/* Info Footer */}
+                    <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-unimed-support/30 text-center">
+                      <Badge variant="outline" className="text-xs bg-white/20 text-white/90">
+                        Caio Lennon • Inovação :D
+                      </Badge>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <Rocket className="w-4 h-4" />
-                      Entrar na Jornada
-                    </div>
-                  )}
-                </Button>
-              </form>
-
-              {/* Info Footer */}
-              <div className="mt-6 pt-4 border-t text-center">
-                <Badge variant="outline" className="text-xs">
-                  Sistema Seguro • Unimed
-                </Badge>
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Footer */}
-          <div className="text-center mt-8 text-sm text-slate-500">
-            <p>Desenvolvido com tecnologia de ponta para a experiência estratégica Unimed</p>
+            {/* Footer */}
+            <div className="text-center mt-6 sm:mt-8 text-xs sm:text-sm text-white/70 entrance-animation stagger-3">
+              <p>Desenvolvido com tecnologia de ponta para a experiência estratégica Unimed</p>
+            </div>
           </div>
         </div>
       </div>
