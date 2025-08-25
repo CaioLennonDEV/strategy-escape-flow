@@ -1,36 +1,30 @@
 
 import React, { useState, useCallback } from 'react';
-// TODO: Instalar dependências do drag & drop:
-// npm install @dnd-kit/core @dnd-kit/sortable @dnd-kit/utilities
-// 
-// Imports que serão descomentados após instalação:
-// import {
-//   DndContext,
-//   DragEndEvent,
-//   DragOverEvent,
-//   DragOverlay,
-//   DragStartEvent,
-//   PointerSensor,
-//   useSensor,
-//   useSensors,
-//   closestCenter,
-//   closestCorners,
-// } from '@dnd-kit/core';
-// import {
-//   SortableContext,
-//   verticalListSortingStrategy,
-//   arrayMove,
-//   useSortable,
-// } from '@dnd-kit/sortable';
-// import { CSS } from '@dnd-kit/utilities';
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, GripVertical, X, ArrowUp, ArrowDown, Target, Zap } from 'lucide-react';
+import { CheckCircle2, GripVertical, X, Target, Zap } from 'lucide-react';
 import type { Action, Pillar } from '@/lib/types';
 
 interface MissionConsoleProps {
@@ -47,65 +41,77 @@ interface DraggableAction extends Action {
   position?: number;
 }
 
-// Componente temporário para item (sem drag & drop)
-const DraggableItem: React.FC<{
+// Componente Sortable para item arrastável
+const SortableItem: React.FC<{
   action: DraggableAction;
   showNumber?: boolean;
   onRemove?: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  canMoveUp?: boolean;
-  canMoveDown?: boolean;
-}> = ({ action, showNumber = false, onRemove, onMoveUp, onMoveDown, canMoveUp = false, canMoveDown = false }) => {
+  isDragging?: boolean;
+}> = ({ 
+  action, 
+  showNumber = false, 
+  onRemove, 
+  isDragging = false
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isItemDragging,
+  } = useSortable({ id: action.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isItemDragging ? 0.5 : 1,
+  };
+
   return (
-    <div className="rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md p-4 transition-all duration-300" style={{
-      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 153, 84, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 153, 84, 0.1)'
-    }}>
+    <div
+      ref={setNodeRef}
+      className={`rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md p-4 transition-all duration-300 cursor-grab active:cursor-grabbing ${
+        isDragging ? 'scale-105 shadow-2xl' : ''
+      }`}
+      style={{
+        ...style,
+        boxShadow: isDragging 
+          ? '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 153, 84, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 30px rgba(0, 153, 84, 0.3)' 
+          : '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 153, 84, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 153, 84, 0.1)'
+      }}
+      {...attributes}
+      {...listeners}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1">
           {showNumber && (
             <Badge 
               variant="secondary" 
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-unimed-primary text-white border-0"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-unimed-primary text-white border-0 flex-shrink-0"
             >
               {action.position}
             </Badge>
           )}
-          <div className="flex-1">
-            <h4 className="font-semibold text-sm text-white/90">{action.title}</h4>
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-sm text-white/90 truncate">{action.title}</h4>
             {action.description && (
               <p className="text-xs text-white/60 mt-1 line-clamp-2">{action.description}</p>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          {showNumber && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onMoveUp}
-                disabled={!canMoveUp}
-                className="h-8 w-8 p-0 hover:bg-unimed-primary/20 text-white/70 hover:text-unimed-primary border border-white/10"
-              >
-                <ArrowUp className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onMoveDown}
-                disabled={!canMoveDown}
-                className="h-8 w-8 p-0 hover:bg-unimed-primary/20 text-white/70 hover:text-unimed-primary border border-white/10"
-              >
-                <ArrowDown className="h-3 w-3" />
-              </Button>
-            </>
-          )}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="p-1 text-white/50">
+            <GripVertical className="h-4 w-4" />
+          </div>
           {showNumber && onRemove && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={onRemove}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemove();
+              }}
               className="h-8 w-8 p-0 hover:bg-red-500/20 text-white/70 hover:text-red-400 border border-white/10"
             >
               <X className="h-3 w-3" />
@@ -117,13 +123,12 @@ const DraggableItem: React.FC<{
   );
 };
 
-// Componente para área de destino (superior)
-const DestinationArea: React.FC<{
+// Componente para área de prioridades (única área)
+const PriorityArea: React.FC<{
   items: DraggableAction[];
   onRemove: (id: string) => void;
-  onMoveUp: (id: string) => void;
-  onMoveDown: (id: string) => void;
-}> = ({ items, onRemove, onMoveUp, onMoveDown }) => {
+  isFrozen: boolean;
+}> = ({ items, onRemove, isFrozen }) => {
   return (
     <div className="rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md p-6" style={{
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 153, 84, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 153, 84, 0.1)'
@@ -132,14 +137,16 @@ const DestinationArea: React.FC<{
         <div className="w-10 h-10 rounded-full bg-unimed-primary/20 flex items-center justify-center">
           <Target className="h-5 w-5 text-unimed-primary" />
         </div>
-        <div>
-          <h3 className="text-lg font-bold text-white">Prioridades Definidas</h3>
-          <p className="text-sm text-white/60">Organize na ordem de importância</p>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-white">Prioridades</h3>
+          <p className="text-sm text-white/60">
+            {isFrozen ? 'Prioridades congeladas' : 'Arraste para reorganizar'}
+          </p>
         </div>
         {items.length > 0 && (
           <Badge 
             variant="outline" 
-            className="ml-auto bg-unimed-primary/10 text-unimed-primary border-unimed-primary/30"
+            className="bg-unimed-primary/10 text-unimed-primary border-unimed-primary/30"
           >
             {items.length} item{items.length !== 1 ? 's' : ''}
           </Badge>
@@ -151,21 +158,17 @@ const DestinationArea: React.FC<{
           <div className="w-20 h-20 border-2 border-dashed border-white/20 rounded-2xl flex items-center justify-center mb-4">
             <GripVertical className="h-8 w-8 text-white/30" />
           </div>
-          <p className="text-sm font-medium text-white/70">Clique nas prioridades abaixo para adicionar</p>
-          <p className="text-xs text-white/50 mt-1">Organize na ordem de importância</p>
+          <p className="text-sm font-medium text-white/70">Nenhuma prioridade definida</p>
+          <p className="text-xs text-white/50 mt-1">Adicione ações da lista abaixo</p>
         </div>
       ) : (
         <div className="space-y-3">
           {items.map((item, index) => (
-            <DraggableItem
+            <SortableItem
               key={item.id}
               action={{ ...item, position: index + 1 }}
               showNumber={true}
-              onRemove={() => onRemove(item.id)}
-              onMoveUp={() => onMoveUp(item.id)}
-              onMoveDown={() => onMoveDown(item.id)}
-              canMoveUp={index > 0}
-              canMoveDown={index < items.length - 1}
+              onRemove={isFrozen ? undefined : () => onRemove(item.id)}
             />
           ))}
         </div>
@@ -174,11 +177,12 @@ const DestinationArea: React.FC<{
   );
 };
 
-// Componente para área de origem (inferior)
-const SourceArea: React.FC<{
+// Componente para área de ações disponíveis
+const AvailableActionsArea: React.FC<{
   items: DraggableAction[];
   onAdd: (id: string) => void;
-}> = ({ items, onAdd }) => {
+  isFrozen: boolean;
+}> = ({ items, onAdd, isFrozen }) => {
   return (
     <div className="rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md p-6" style={{
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 153, 84, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 153, 84, 0.1)'
@@ -187,14 +191,16 @@ const SourceArea: React.FC<{
         <div className="w-10 h-10 rounded-full bg-unimed-light/20 flex items-center justify-center">
           <Zap className="h-5 w-5 text-unimed-light" />
         </div>
-        <div>
-          <h3 className="text-lg font-bold text-white">Prioridades Disponíveis</h3>
-          <p className="text-sm text-white/60">Clique para adicionar à lista</p>
+        <div className="flex-1">
+          <h3 className="text-lg font-bold text-white">Ações Disponíveis</h3>
+          <p className="text-sm text-white/60">
+            {isFrozen ? 'Prioridades congeladas' : 'Clique para adicionar'}
+          </p>
         </div>
         {items.length > 0 && (
           <Badge 
             variant="outline" 
-            className="ml-auto bg-unimed-light/10 text-unimed-light border-unimed-light/30"
+            className="bg-unimed-light/10 text-unimed-light border-unimed-light/30"
           >
             {items.length} item{items.length !== 1 ? 's' : ''}
           </Badge>
@@ -204,17 +210,44 @@ const SourceArea: React.FC<{
       {items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-8 text-white/50">
           <CheckCircle2 className="h-12 w-12 text-unimed-primary mb-3" />
-          <p className="text-sm font-medium text-white/70">Todas as prioridades foram organizadas!</p>
+          <p className="text-sm font-medium text-white/70">Todas as ações foram priorizadas!</p>
         </div>
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
             <div
               key={item.id}
-              onClick={() => onAdd(item.id)}
-              className="cursor-pointer hover:scale-[1.02] transition-all duration-300"
+              onClick={() => !isFrozen && onAdd(item.id)}
+              className={`rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md p-4 transition-all duration-300 ${
+                !isFrozen ? 'cursor-pointer hover:scale-[1.02] hover:border-unimed-primary/50' : 'cursor-not-allowed opacity-50'
+              }`}
+              style={{
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 153, 84, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 20px rgba(0, 153, 84, 0.1)'
+              }}
             >
-              <DraggableItem action={item} />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 flex-1">
+                  <div className="w-8 h-8 rounded-full bg-unimed-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-4 w-4 text-unimed-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm text-white/90 truncate">{item.title}</h4>
+                    {item.description && (
+                      <p className="text-xs text-white/60 mt-1 line-clamp-2">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+                {!isFrozen && (
+                  <div className="flex-shrink-0">
+                    <Badge 
+                      variant="outline" 
+                      className="bg-unimed-primary/10 text-unimed-primary border-unimed-primary/30 text-xs"
+                    >
+                      Adicionar
+                    </Badge>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -231,6 +264,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   className = ''
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
   const [destinationItems, setDestinationItems] = useState<DraggableAction[]>([]);
   const [sourceItems, setSourceItems] = useState<DraggableAction[]>(
     actions.map(action => ({
@@ -239,8 +273,30 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
       isInDestination: false
     }))
   );
+  const [activeId, setActiveId] = useState<string | null>(null);
   
   const { toast } = useToast();
+
+  // Sensores para drag & drop (otimizados para mobile)
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    })
+  );
+
+  // Item ativo sendo arrastado
+  const activeItem = React.useMemo(() => {
+    if (!activeId) return null;
+    return [...destinationItems, ...sourceItems].find(item => item.id === activeId);
+  }, [activeId, destinationItems, sourceItems]);
 
   // Função para mover item da origem para o destino
   const moveToDestination = useCallback((itemId: string) => {
@@ -260,29 +316,64 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
     setSourceItems(prev => [...prev, { ...item, isInDestination: false }]);
   }, [destinationItems]);
 
-  // Função para mover item para cima no destino
-  const moveUp = useCallback((itemId: string) => {
-    setDestinationItems(prev => {
-      const index = prev.findIndex(item => item.id === itemId);
-      if (index <= 0) return prev;
-      
-      const newItems = [...prev];
-      [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
-      return newItems;
-    });
-  }, []);
+  // Handlers para drag & drop
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    if (isFrozen) return;
+    setActiveId(event.active.id as string);
+  }, [isFrozen]);
 
-  // Função para mover item para baixo no destino
-  const moveDown = useCallback((itemId: string) => {
-    setDestinationItems(prev => {
-      const index = prev.findIndex(item => item.id === itemId);
-      if (index >= prev.length - 1) return prev;
-      
-      const newItems = [...prev];
-      [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
-      return newItems;
-    });
-  }, []);
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    if (isFrozen) return;
+    
+    const { active, over } = event;
+    setActiveId(null);
+    
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    // Se o item está sendo arrastado para uma área diferente
+    const activeItem = [...destinationItems, ...sourceItems].find(item => item.id === activeId);
+    const overItem = [...destinationItems, ...sourceItems].find(item => item.id === overId);
+
+    if (!activeItem || !overItem) return;
+
+    // Se o item ativo está na origem e o item de destino está no destino
+    if (!activeItem.isInDestination && overItem.isInDestination) {
+      moveToDestination(activeId);
+      return;
+    }
+
+    // Se o item ativo está no destino e o item de destino está na origem
+    if (activeItem.isInDestination && !overItem.isInDestination) {
+      moveToSource(activeId);
+      return;
+    }
+
+    // Reordenação dentro da mesma área
+    if (activeItem.isInDestination && overItem.isInDestination) {
+      setDestinationItems(prev => {
+        const oldIndex = prev.findIndex(item => item.id === activeId);
+        const newIndex = prev.findIndex(item => item.id === overId);
+        
+        if (oldIndex !== newIndex) {
+          return arrayMove(prev, oldIndex, newIndex);
+        }
+        return prev;
+      });
+    } else if (!activeItem.isInDestination && !overItem.isInDestination) {
+      setSourceItems(prev => {
+        const oldIndex = prev.findIndex(item => item.id === activeId);
+        const newIndex = prev.findIndex(item => item.id === overId);
+        
+        if (oldIndex !== newIndex) {
+          return arrayMove(prev, oldIndex, newIndex);
+        }
+        return prev;
+      });
+    }
+  }, [isFrozen, destinationItems, sourceItems, moveToDestination, moveToSource]);
 
   const handleComplete = async () => {
     try {
@@ -330,9 +421,12 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
         throw rankingError;
       }
 
+      // Congelar as prioridades
+      setIsFrozen(true);
+
       toast({
         title: "Sucesso",
-        description: "Prioridades salvas com sucesso!",
+        description: "Prioridades salvas e congeladas com sucesso!",
         variant: "default",
       });
 
@@ -354,7 +448,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   };
 
   return (
-    <div className={`space-y-8 ${className}`}>
+    <div className={`space-y-6 ${className}`}>
       {/* Header da Missão */}
       <div className="mission-header">
         <div className="flex items-center justify-center gap-3 mb-4">
@@ -384,33 +478,56 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
         </div>
       </div>
 
-      {/* Área de Destino */}
-      <DestinationArea
-        items={destinationItems}
-        onRemove={moveToSource}
-        onMoveUp={moveUp}
-        onMoveDown={moveDown}
-      />
+      {/* Contexto principal de drag & drop */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        {/* Área de Prioridades */}
+        <SortableContext items={destinationItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+          <PriorityArea
+            items={destinationItems}
+            onRemove={moveToSource}
+            isFrozen={isFrozen}
+          />
+        </SortableContext>
 
-      <Separator className="bg-white/10" />
+        <Separator className="bg-white/10" />
 
-      {/* Área de Origem */}
-      <SourceArea 
-        items={sourceItems} 
-        onAdd={moveToDestination}
-      />
+        {/* Área de Ações Disponíveis */}
+        <SortableContext items={sourceItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+          <AvailableActionsArea 
+            items={sourceItems} 
+            onAdd={moveToDestination}
+            isFrozen={isFrozen}
+          />
+        </SortableContext>
+
+        {/* Overlay para item sendo arrastado */}
+        <DragOverlay>
+          {activeItem ? (
+            <SortableItem
+              action={activeItem}
+              showNumber={activeItem.isInDestination}
+              isDragging={true}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {/* Botão de conclusão */}
       <div className="flex justify-center pt-6">
         <Button
           onClick={handleComplete}
-          disabled={isSubmitting || destinationItems.length !== actions.length}
+          disabled={isSubmitting || destinationItems.length !== actions.length || isFrozen}
           className="px-8 py-4 text-base font-bold transition-all duration-300"
           style={{
-            backgroundColor: destinationItems.length === actions.length ? 'hsl(148, 201, 91)' : 'rgba(255, 255, 255, 0.1)',
+            backgroundColor: destinationItems.length === actions.length && !isFrozen ? 'hsl(148, 201, 91)' : 'rgba(255, 255, 255, 0.1)',
             border: '2px solid rgba(255, 255, 255, 0.2)',
-            color: destinationItems.length === actions.length ? '#000' : 'rgba(255, 255, 255, 0.5)',
-            boxShadow: destinationItems.length === actions.length 
+            color: destinationItems.length === actions.length && !isFrozen ? '#000' : 'rgba(255, 255, 255, 0.5)',
+            boxShadow: destinationItems.length === actions.length && !isFrozen
               ? '0 0 20px rgba(148, 201, 91, 0.4)' 
               : '0 0 15px rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(10px)'
@@ -420,6 +537,11 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
               Salvando...
+            </>
+          ) : isFrozen ? (
+            <>
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              Prioridades Concluídas
             </>
           ) : (
             <>
