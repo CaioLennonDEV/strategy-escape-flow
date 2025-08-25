@@ -19,6 +19,19 @@ const PillarsPage = () => {
   const [nickname, setNickname] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
 
+  // Gerar posições fixas para as bolinhas flutuantes
+  const floatingElements = React.useMemo(() => {
+    return [...Array(15)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${6 + Math.random() * 4}s`,
+      width: `${4 + Math.random() * 8}px`,
+      height: `${4 + Math.random() * 8}px`
+    }));
+  }, []);
+
   React.useEffect(() => {
     const loadPillars = async () => {
       try {
@@ -34,6 +47,8 @@ const PillarsPage = () => {
           .from('pillars')
           .select('*')
           .order('name');
+
+
 
         if (pillarsError) {
           console.error('Erro ao buscar pilares:', pillarsError);
@@ -59,6 +74,7 @@ const PillarsPage = () => {
             completedAt: status?.completed_at
           };
         });
+
 
         setPillars(pillarsWithStatus);
       } catch (error) {
@@ -107,17 +123,17 @@ const PillarsPage = () => {
       <div className="min-h-screen escape-run-body relative overflow-hidden">
         {/* Floating Elements */}
         <div className="floating-elements">
-          {[...Array(15)].map((_, i) => (
+          {floatingElements.map((element) => (
             <div
-              key={i}
+              key={element.id}
               className="floating-element"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
-                width: `${4 + Math.random() * 8}px`,
-                height: `${4 + Math.random() * 8}px`
+                left: element.left,
+                top: element.top,
+                animationDelay: element.animationDelay,
+                animationDuration: element.animationDuration,
+                width: element.width,
+                height: element.height
               }}
             />
           ))}
@@ -127,15 +143,15 @@ const PillarsPage = () => {
           <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
             {/* Header da Missão */}
             <div className="mission-header">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-unimed-primary to-unimed-light text-white text-2xl sm:text-3xl mb-4 sm:mb-6 mission-pulse">
-                <Zap className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
+              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-gradient-to-br from-unimed-primary to-unimed-light text-white text-xl sm:text-2xl md:text-3xl mb-3 sm:mb-4 md:mb-6 mission-pulse">
+                <Zap className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-12 lg:h-12" />
               </div>
               
-              <div className="space-y-3 sm:space-y-4">
-                <h1 className="font-poppins font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white text-glow leading-tight">
+              <div className="space-y-2 sm:space-y-3 md:space-y-4">
+                <h1 className="font-poppins font-bold text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl text-white text-glow leading-tight">
                   CENTRO DE COMANDO
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed">
                   Bem-vindo à sua jornada estratégica, <span className="font-bold text-unimed-light">{nickname}</span>. 
                   Escolha um pilar para começar sua missão.
                 </p>
@@ -146,11 +162,16 @@ const PillarsPage = () => {
             <div className="space-y-6 sm:space-y-8">
 
               {/* Grid Responsivo */}
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
                 {pillars.map((pillar, index) => (
                   <div 
                     key={pillar.id} 
-                    className={`entrance-animation stagger-${index + 1}`}
+                    style={{ 
+                      opacity: 0,
+                      transform: 'translateY(30px)',
+                      animation: 'slide-up 0.6s ease-out forwards',
+                      animationDelay: `${(index + 1) * 0.1}s`
+                    }}
                   >
                     <DoorCard
                       pillar={pillar}

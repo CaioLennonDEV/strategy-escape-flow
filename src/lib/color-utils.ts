@@ -22,6 +22,34 @@ const uniqueColors = [
   '#D5A6BD', // Rosa pálido
 ];
 
+// Mapeamento de cores específicas para os pilares
+const pillarColors = {
+  'Financeiro': '#009954', // Verde principal Unimed
+  'Mercado e Clientes': '#b1d34b', // Verde claro Unimed
+  'Processos Internos': '#004e4c', // Verde escuro Unimed
+  'Aprendizado e Crescimento': '#f47920', // Laranja Unimed
+};
+
+// Função para obter cor padronizada do pilar baseada no nome
+export const getPillarColor = (pillarName: string): string => {
+  // Verificar se o nome exato existe
+  let color = pillarColors[pillarName as keyof typeof pillarColors];
+  
+  // Se não encontrar, tentar encontrar por similaridade
+  if (!color) {
+    const normalizedName = pillarName.toLowerCase().trim();
+    for (const [key, value] of Object.entries(pillarColors)) {
+      if (key.toLowerCase().trim() === normalizedName) {
+        color = value;
+        break;
+      }
+    }
+  }
+  
+
+  return color || '#009954';
+};
+
 // Função para gerar uma cor única baseada no ID
 export const getItemColor = (itemId: string): string => {
   // Usar o hash do ID para gerar um índice consistente

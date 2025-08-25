@@ -114,10 +114,7 @@
     animation-duration: 10s !important;
   }
 
-  /* Pausa animações quando há interação */
-  .floating-elements.paused .floating-element {
-    animation-play-state: paused;
-  }
+
 
   /* Otimizações para cartão 3D em mobile */
   .preserve-3d {
@@ -337,5 +334,53 @@
   
   .quick-actions-container {
     gap: 0.5rem;
+  }
+}
+
+/* Estilos para o modal de troca de posições */
+.swap-modal-content {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.swap-modal-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.swap-modal-grid.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.swap-modal-grid.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsividade para o modal */
+@media (max-width: 640px) {
+  .swap-modal-content {
+    max-height: 90vh;
+    margin: 0.25rem;
+  }
+  
+  .swap-modal-grid {
+    gap: 0.5rem;
+  }
+  
+  .swap-modal-grid.grid-3,
+  .swap-modal-grid.grid-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .swap-modal-content {
+    max-height: 85vh;
+    margin: 0.125rem;
+  }
+  
+  .swap-modal-grid.grid-3,
+  .swap-modal-grid.grid-4 {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

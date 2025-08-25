@@ -14,8 +14,21 @@ const AchievementPage = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
   const [nickname, setNickname] = React.useState('');
-  const [isInteracting, setIsInteracting] = useState(false);
   const isMobile = useIsMobile();
+
+  // Gerar posições fixas para as bolinhas flutuantes
+  const floatingElements = React.useMemo(() => {
+    const count = isMobile ? 8 : 15;
+    return [...Array(count)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${isMobile ? 8 + Math.random() * 6 : 6 + Math.random() * 4}s`,
+      width: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`,
+      height: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`
+    }));
+  }, [isMobile]);
 
   React.useEffect(() => {
     // Carregar nickname do localStorage
@@ -28,7 +41,6 @@ const AchievementPage = () => {
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current || isMobile) return;
 
-    setIsInteracting(true);
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -42,7 +54,6 @@ const AchievementPage = () => {
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
     if (!cardRef.current || !isMobile) return;
 
-    setIsInteracting(true);
     const touch = e.touches[0];
     const rect = cardRef.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
@@ -56,13 +67,11 @@ const AchievementPage = () => {
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setIsInteracting(false);
     setRotation({ x: 0, y: 0 });
   };
 
   const handleTouchEnd = () => {
     if (isMobile) {
-      setIsInteracting(false);
       setRotation({ x: 0, y: 0 });
     }
   };
@@ -124,18 +133,18 @@ const AchievementPage = () => {
     <SessionGuard>
       <div className="min-h-screen escape-run-body relative overflow-hidden">
         {/* Floating Elements - Reduzido para mobile */}
-        <div className={`floating-elements ${isInteracting ? 'paused' : ''}`}>
-          {[...Array(isMobile ? 8 : 15)].map((_, i) => (
+        <div className="floating-elements">
+          {floatingElements.map((element) => (
             <div
-              key={i}
+              key={element.id}
               className="floating-element"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${isMobile ? 8 + Math.random() * 6 : 6 + Math.random() * 4}s`,
-                width: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`,
-                height: `${isMobile ? 2 + Math.random() * 4 : 4 + Math.random() * 8}px`
+                left: element.left,
+                top: element.top,
+                animationDelay: element.animationDelay,
+                animationDuration: element.animationDuration,
+                width: element.width,
+                height: element.height
               }}
             />
           ))}

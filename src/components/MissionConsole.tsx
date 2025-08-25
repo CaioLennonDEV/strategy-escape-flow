@@ -8,10 +8,10 @@ import { Trophy, Target, CheckCircle2, ArrowUpDown, Zap, Star, Timer } from 'luc
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useQuickOrdering } from '@/hooks/use-quick-ordering';
-import { useReorderAnimation } from '@/hooks/use-reorder-animation';
-import { QuickActions } from '@/components/ui/quick-actions';
-import { getItemColor, getItemGradient, getItemBorderColor } from '@/lib/color-utils';
+import { useSwapModalOrdering } from '@/hooks/use-swap-modal-ordering';
+import { SwapPositionModal } from '@/components/ui/swap-position-modal';
+import { SwapButton } from '@/components/ui/swap-button';
+import { getItemColor, getItemGradient, getItemBorderColor, getPillarColor } from '@/lib/color-utils';
 import type { Action, Pillar } from '@/lib/types';
 
 interface MissionConsoleProps {
@@ -29,6 +29,8 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   isCompleted = false,
   className = ''
 }) => {
+  // Usar cor padronizada baseada no nome do pilar
+  const pillarColor = getPillarColor(pillar.name);
   const [progress, setProgress] = React.useState(0);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
@@ -39,25 +41,33 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
     return () => clearTimeout(timer);
   }, [isCompleted]);
 
-  // Hook para animação de reordenação
-  const { triggerAnimation, isAnimating } = useReorderAnimation();
-
-  // Hook para ordenação com botões
+  // Hook para ordenação com modal de troca
   const {
     orderedItems: actionRanking,
-    moveItem,
-    canMoveUp,
-    canMoveDown,
-    getItemPosition
-  } = useQuickOrdering({
+    isModalOpen,
+    selectedItem,
+    targetPosition,
+    openSwapModal,
+    closeModal,
+    selectTargetPosition,
+    confirmSwap,
+    getItemPosition,
+    totalItems
+  } = useSwapModalOrdering({
     items: actions,
     onReorder: (newItems) => {
       // Callback opcional para quando a ordem muda
-    },
-    onItemMove: (itemId, fromPosition, toPosition, direction, affectedItems) => {
-      triggerAnimation(itemId, fromPosition, toPosition, direction, affectedItems);
     }
   });
+
+  // Criar objeto de posições atuais para o modal
+  const currentPositions = React.useMemo(() => {
+    const positions: Record<string, number> = {};
+    actionRanking.forEach((action, index) => {
+      positions[action.id] = index + 1;
+    });
+    return positions;
+  }, [actionRanking]);
 
   const saveRankingAndComplete = async () => {
     try {
@@ -115,14 +125,14 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   return (
     <div className={`space-y-4 sm:space-y-6 ${className}`}>
       {/* Header da Missão */}
-      <Card className="escape-run-card">
+      <Card className="rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md">
         <CardHeader className="pb-3 sm:pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-3 sm:gap-4">
               <div 
                 className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-gradient-to-br from-unimed-primary to-unimed-light flex items-center justify-center text-lg sm:text-xl"
                 style={{ 
-                  background: `linear-gradient(135deg, ${pillar.color}15 0%, ${pillar.color}30 100%)`
+                  background: `linear-gradient(135deg, ${pillarColor}15 0%, ${pillarColor}30 100%)`
                 }}
               >
                 <Target className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-white" />
@@ -144,7 +154,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
       </Card>
 
       {/* Console de Priorização */}
-      <Card className="escape-run-card">
+      <Card className="rounded-2xl border-2 border-unimed-primary/30 bg-black/40 backdrop-blur-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white text-lg sm:text-xl">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-unimed-orange" />
@@ -155,7 +165,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
           <div className="p-3 sm:p-4 rounded-xl bg-gradient-to-r from-unimed-support/5 to-unimed-info/5 border border-unimed-support/20">
             <h4 className="font-bold text-white mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base">
               <Zap className="w-3 h-3 sm:w-4 sm:h-4" />
-              Use os botões para reorganizar as ações:
+              Clique no botão de troca para reorganizar as ações:
             </h4>
             <div className="space-y-2 sm:space-y-3">
               {actionRanking.map((action, index) => {
@@ -165,9 +175,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
                 return (
                   <div 
                     key={action.id}
-                    className={`backdrop-blur-sm p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 flex items-center gap-3 sm:gap-4 unique-color-item ${
-                      isAnimating(action.id) ? 'item-reordering' : ''
-                    }`}
+                    className="backdrop-blur-sm p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 flex items-center gap-3 sm:gap-4 unique-color-item"
                     style={{ 
                       background: getItemGradient(itemColor),
                       borderColor: getItemBorderColor(itemColor)
@@ -184,9 +192,9 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
                       <ArrowUpDown className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-bold text-xs sm:text-sm text-slate-800 leading-tight">{action.title}</h5>
+                      <h5 className="font-bold text-xs sm:text-sm text-white leading-tight">{action.title}</h5>
                       {action.description && (
-                        <p className="text-xs text-slate-600 mt-1 font-medium leading-relaxed">{action.description}</p>
+                        <p className="text-xs text-white/70 mt-1 font-medium leading-relaxed">{action.description}</p>
                       )}
                     </div>
                     <div className="flex items-center gap-3">
@@ -199,12 +207,11 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
                       >
                         {currentPosition}º
                       </Badge>
-                      <QuickActions
-                        onMoveUp={() => moveItem(action.id, 'up')}
-                        onMoveDown={() => moveItem(action.id, 'down')}
-                        canMoveUp={canMoveUp(action.id)}
-                        canMoveDown={canMoveDown(action.id)}
+                      <SwapButton
+                        onClick={() => openSwapModal(action)}
                         disabled={isCompleted}
+                        size="md"
+                        variant="outline"
                       />
                     </div>
                   </div>
@@ -225,6 +232,19 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de troca de posições */}
+      <SwapPositionModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        selectedItem={selectedItem}
+        targetPosition={targetPosition}
+        onSelectPosition={selectTargetPosition}
+        onConfirmSwap={confirmSwap}
+        totalItems={totalItems}
+        currentPositions={currentPositions}
+        actions={actions}
+      />
     </div>
   );
 };

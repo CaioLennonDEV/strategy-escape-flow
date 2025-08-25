@@ -23,6 +23,19 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { toast } = useToast();
 
+  // Gerar posições fixas para as bolinhas flutuantes
+  const floatingElements = React.useMemo(() => {
+    return [...Array(14)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${6 + Math.random() * 4}s`,
+      width: `${4 + Math.random() * 8}px`,
+      height: `${4 + Math.random() * 8}px`
+    }));
+  }, []);
+
   const handleSubmit = async () => {
     if (!confession.trim()) {
       toast({
@@ -86,17 +99,17 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
           <div className="min-h-screen escape-run-body relative overflow-hidden">
         {/* Floating Elements */}
         <div className="floating-elements">
-          {[...Array(14)].map((_, i) => (
+          {floatingElements.map((element) => (
             <div
-              key={i}
+              key={element.id}
               className="floating-element"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
-                width: `${4 + Math.random() * 8}px`,
-                height: `${4 + Math.random() * 8}px`
+                left: element.left,
+                top: element.top,
+                animationDelay: element.animationDelay,
+                animationDuration: element.animationDuration,
+                width: element.width,
+                height: element.height
               }}
             />
           ))}

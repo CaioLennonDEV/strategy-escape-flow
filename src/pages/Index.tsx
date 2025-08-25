@@ -24,6 +24,19 @@ const Index = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Gerar posições fixas para as bolinhas flutuantes
+  const floatingElements = React.useMemo(() => {
+    return [...Array(20)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      animationDelay: `${Math.random() * 8}s`,
+      animationDuration: `${6 + Math.random() * 4}s`,
+      width: `${4 + Math.random() * 8}px`,
+      height: `${4 + Math.random() * 8}px`
+    }));
+  }, []);
+
   const handleInputChange = (field: keyof LoginForm) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -97,17 +110,17 @@ const Index = () => {
       <div className="min-h-screen escape-run-body relative overflow-hidden">
         {/* Floating Elements */}
         <div className="floating-elements">
-          {[...Array(20)].map((_, i) => (
+          {floatingElements.map((element) => (
             <div
-              key={i}
+              key={element.id}
               className="floating-element"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${6 + Math.random() * 4}s`,
-                width: `${4 + Math.random() * 8}px`,
-                height: `${4 + Math.random() * 8}px`
+                left: element.left,
+                top: element.top,
+                animationDelay: element.animationDelay,
+                animationDuration: element.animationDuration,
+                width: element.width,
+                height: element.height
               }}
             />
           ))}
@@ -130,9 +143,10 @@ const Index = () => {
                 </p>
               </div>
             </div>
+            <div className="h-8 sm:h-10" />
 
             {/* Main Content Grid */}
-            <div className="grid max-w-5xl mx-auto">
+            <div className="grid max-w-3xl mx-auto">
               {/* Login Form */}
               <div className="md:col-span-2 entrance-animation stagger-1">
                 <Card className="escape-run-card">
@@ -201,21 +215,9 @@ const Index = () => {
                         )}
                       </Button>
                     </form>
-
-                    {/* Info Footer */}
-                    <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-unimed-support/30 text-center">
-                      <Badge variant="outline" className="text-xs bg-white/20 text-white/90">
-                        Caio Lennon • Inovação :D
-                      </Badge>
-                    </div>
                   </CardContent>
                 </Card>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="text-center mt-6 sm:mt-8 text-xs sm:text-sm text-white/70 entrance-animation stagger-3">
-              <p>Desenvolvido com tecnologia de ponta para a experiência estratégica Unimed</p>
             </div>
           </div>
         </div>

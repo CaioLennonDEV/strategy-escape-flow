@@ -284,6 +284,25 @@
       0 0 30px rgba(0, 153, 84, 0.2);
   }
 
+  /* Novos estilos para os cards modernos */
+  .pillar-card {
+    @apply rounded-2xl backdrop-blur-md overflow-hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pillar-card:hover {
+    transform: translateY(-8px) scale(1.05);
+  }
+
+  .pillar-icon {
+    @apply rounded-2xl flex items-center justify-center;
+    transition: all 0.3s ease;
+  }
+
+  .pillar-icon:hover {
+    transform: scale(1.1);
+  }
+
   .escape-run-input {
     @apply rounded-2xl border-2 border-unimed-support/50 bg-black/30 backdrop-blur-sm text-white;
     transition: all 0.3s ease;
