@@ -2,9 +2,9 @@
 import React from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { PriorityList } from '@/components/ui/priority-list';
+import { PriorityListV4 } from '@/components/ui/priority-list-v4';
 import type { Action, Pillar } from '@/lib/types';
-import type { PriorityItem } from '@/hooks/use-priority-popover';
+import type { PriorityItem } from '@/hooks/use-priority-v4';
 
 interface MissionConsoleProps {
   pillar: Pillar;
@@ -94,7 +94,7 @@ export const MissionConsole: React.FC<MissionConsoleProps> = ({
   };
 
   return (
-    <PriorityList
+    <PriorityListV4
       pillar={pillar}
       actions={actions}
       onComplete={handlePrioritiesComplete}

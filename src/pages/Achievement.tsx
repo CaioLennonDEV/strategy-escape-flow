@@ -155,7 +155,14 @@ const AchievementPage = () => {
           <div className="text-center space-y-3 sm:space-y-4 md:space-y-6 entrance-animation">
             <Button
               onClick={() => navigate('/pillars')}
-              className="escape-run-button mb-3 sm:mb-4 text-sm sm:text-base"
+              className="mb-3 sm:mb-4 text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 font-bold transition-all duration-300"
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                color: '#FFFFFF',
+                boxShadow: '0 0 15px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(10px)'
+              }}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar ao Centro de Comando

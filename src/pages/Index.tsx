@@ -135,8 +135,8 @@ const Index = () => {
               </div>
               
               <div className="space-y-4 sm:space-y-6">
-                <h1 className="font-poppins font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white text-glow leading-tight">
-                  ESCAPE RUN
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-2 sm:mb-4 font-orbitron tracking-wider entrance-animation">
+                  MISSÃO ESTRATÉGICA
                 </h1>
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed">
                   Jornada da Estratégia • Missão Colaborativa
@@ -218,6 +218,8 @@ const Index = () => {
                   </CardContent>
                 </Card>
               </div>
+
+
             </div>
           </div>
         </div>

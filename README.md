@@ -1,73 +1,125 @@
-# Welcome to your Lovable project
+# Missão Estratégica
 
-## Project info
+Sistema de priorização estratégica para empresas, desenvolvido com React, TypeScript e Shadcn UI.
 
-**URL**: https://lovable.dev/projects/0580a51b-2d4b-4890-a08a-7d40a17aab63
+## Sobre o Projeto
 
-## How can I edit this code?
+**Missão Estratégica** é uma aplicação web moderna que permite às empresas organizarem e priorizarem suas ações estratégicas de forma intuitiva e visual. O sistema oferece:
 
-There are several ways of editing your application.
+- 🎯 Priorização visual com animações fluidas
+- 📱 Interface responsiva para mobile e desktop
+- 🎨 Design moderno com tema glassmorphism
+- ⚡ Performance otimizada com React 18
+- 🔒 Autenticação segura via OTP
+- 💾 Persistência de dados com Supabase
 
-**Use Lovable**
+## Tecnologias Utilizadas
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0580a51b-2d4b-4890-a08a-7d40a17aab63) and start prompting.
+- **Frontend**: React 18 + TypeScript
+- **UI**: Shadcn UI + Tailwind CSS
+- **Backend**: Supabase (Auth, Database, Storage)
+- **Build**: Vite
+- **Estado**: Redux Toolkit
+- **Roteamento**: React Router DOM
 
-Changes made via Lovable will be committed automatically to this repo.
+## Como Executar o Projeto
 
-**Use your preferred IDE**
+### Pré-requisitos
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18+ 
+- npm ou yarn
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Instalação
 
-Follow these steps:
+```bash
+# Clone o repositório
+git clone <URL_DO_REPOSITORIO>
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Entre na pasta do projeto
+cd strategy-escape-flow
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Instale as dependências
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Execute o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Acesse a aplicação
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Abra [http://localhost:5173](http://localhost:5173) no seu navegador.
 
-**Use GitHub Codespaces**
+## Funcionalidades Principais
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 🎯 Sistema de Priorização V4
+- Priorização com um clique
+- Animações de deslize suaves
+- Ordenação visual automática
+- Interface responsiva
 
-## What technologies are used for this project?
+### 📊 Gestão de Pilares
+- Criação e edição de pilares estratégicos
+- Ações organizadas por categoria
+- Progresso visual em tempo real
 
-This project is built with:
+### 🔐 Autenticação
+- Login via OTP (One-Time Password)
+- Sessões seguras
+- Proteção de rotas
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Estrutura do Projeto
 
-## How can I deploy this project?
+```
+src/
+├── components/          # Componentes React
+│   ├── ui/             # Componentes de UI (Shadcn)
+│   └── examples/       # Exemplos de uso
+├── hooks/              # Custom hooks
+├── pages/              # Páginas da aplicação
+├── lib/                # Utilitários e tipos
+└── integrations/       # Integrações externas (Supabase)
+```
 
-Simply open [Lovable](https://lovable.dev/projects/0580a51b-2d4b-4890-a08a-7d40a17aab63) and click on Share -> Publish.
+## Desenvolvimento
 
-## Can I connect a custom domain to my Lovable project?
+### Scripts Disponíveis
 
-Yes, you can!
+```bash
+npm run dev          # Servidor de desenvolvimento
+npm run build        # Build de produção
+npm run preview      # Preview do build
+npm run lint         # Linting do código
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Padrões de Código
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **TypeScript**: Tipagem forte em todo o projeto
+- **ESLint**: Configuração Airbnb
+- **Prettier**: Formatação automática
+- **Hooks**: Lógica encapsulada em custom hooks
+- **Componentes**: Funcionais com React 18
+
+## Deploy
+
+O projeto pode ser deployado em qualquer plataforma que suporte aplicações React:
+
+- **Vercel**: Deploy automático
+- **Netlify**: Deploy com drag & drop
+- **GitHub Pages**: Deploy via GitHub Actions
+- **AWS Amplify**: Deploy na AWS
+
+## Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Suporte
+
+Para suporte, entre em contato através do [Lovable](https://lovable.dev/projects/0580a51b-2d4b-4890-a08a-7d40a17aab63).

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Zap, Target, Timer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MissionConsole } from '@/components/MissionConsole';
-import { ConfessionalScreen } from '@/components/ConfessionalScreen';
+import { DiaryScreen } from '@/components/ConfessionalScreen';
 import type { Pillar, Action } from '@/lib/types';
 
 const PillarPage = () => {
@@ -140,7 +140,7 @@ const PillarPage = () => {
 
       setIsCompleted(true);
       
-      // Buscar a ação #1 do ranking para o confessionário
+      // Buscar a ação #1 do ranking para o diário
       const { data: prioritiesData } = await supabase
         .from('user_priorities')
         .select('action_id, rank')
@@ -223,7 +223,17 @@ const PillarPage = () => {
           <div className="flex items-center justify-center min-h-screen relative z-10">
             <div className="text-center space-y-3 sm:space-y-4">
               <p className="text-white/90 font-medium text-sm sm:text-base">Pilar não encontrado</p>
-              <Button onClick={handleBack} className="escape-run-button text-sm sm:text-base">
+              <Button 
+                onClick={handleBack} 
+                className="text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 font-bold transition-all duration-300"
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 0 15px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar para Centro de Comando
               </Button>
@@ -234,11 +244,11 @@ const PillarPage = () => {
     );
   }
 
-  // Se o confessionário deve ser mostrado
+          // Se o diário deve ser mostrado
   if (showConfessional && topAction) {
     return (
       <SessionGuard>
-        <ConfessionalScreen
+        <DiaryScreen
           pillar={pillar}
           topAction={topAction}
           onComplete={handleConfessionalComplete}
@@ -272,7 +282,17 @@ const PillarPage = () => {
           <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
             {/* Header */}
             <div className="flex items-center gap-3 sm:gap-4 entrance-animation">
-              <Button onClick={handleBack} className="escape-run-button text-sm sm:text-base">
+              <Button 
+                onClick={handleBack} 
+                className="text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 font-bold transition-all duration-300"
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 0 15px rgba(255, 255, 255, 0.2), inset 0 0 10px rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Voltar ao Centro de Comando
               </Button>

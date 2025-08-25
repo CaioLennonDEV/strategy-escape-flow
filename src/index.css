@@ -251,7 +251,7 @@
     border-radius: 3px;
   }
 
-  /* Estilos Escape Run */
+  /* Estilos Missão Estratégica */
   .escape-run-bg {
     background: linear-gradient(135deg, 
       hsl(0, 153%, 84%) 0%, 
@@ -738,7 +738,7 @@
   }
 }
 
-/* Animações Escape Run */
+/* Animações Missão Estratégica */
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -843,6 +843,144 @@
       0 0 20px rgba(0, 153, 84, 0.8),
       0 0 30px rgba(0, 153, 84, 0.6);
   }
+}
+
+/* Animações de deslize para priorização */
+@keyframes slide-to-position {
+  0% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+  }
+  10% {
+    transform: scale(1.06) translateY(-8px);
+    box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.3);
+    z-index: 20;
+  }
+  25% {
+    transform: scale(1.1) translateY(-20px);
+    box-shadow: 0 25px 35px -8px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+  }
+  40% {
+    transform: scale(1.08) translateY(-18px);
+    box-shadow: 0 20px 30px -6px rgba(0, 0, 0, 0.35);
+    z-index: 20;
+  }
+  65% {
+    transform: scale(1.04) translateY(-8px);
+    box-shadow: 0 12px 18px -4px rgba(0, 0, 0, 0.25);
+    z-index: 20;
+  }
+  85% {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15);
+    z-index: 20;
+  }
+  95% {
+    transform: scale(1.005) translateY(-1px);
+    box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.12);
+    z-index: 20;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translateY(5px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes settle-in {
+  0% {
+    transform: scale(1.015) translateY(-1px);
+    box-shadow: 0 6px 10px -2px rgba(0, 0, 0, 0.15);
+  }
+  40% {
+    transform: scale(1.008) translateY(-0.5px);
+    box-shadow: 0 5px 8px -1px rgba(0, 0, 0, 0.12);
+  }
+  70% {
+    transform: scale(1.002) translateY(-0.2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.11);
+  }
+  85% {
+    transform: scale(1.001) translateY(-0.1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.105);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Classes de animação */
+.animate-slide-to-position {
+  animation: slide-to-position 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.animate-settle-in {
+  animation: settle-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Efeito de pulse sutil durante animação */
+@keyframes subtle-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.animate-subtle-pulse {
+  animation: subtle-pulse 0.8s ease-in-out infinite;
+}
+
+/* Animação de brilho para números de prioridade */
+@keyframes priority-glow {
+  0%, 100% {
+    text-shadow: 
+      0 0 6px currentColor,
+      0 0 12px currentColor,
+      0 0 18px currentColor,
+      0 0 24px currentColor,
+      0 0 30px currentColor;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.8));
+  }
+  50% {
+    text-shadow: 
+      0 0 10px currentColor,
+      0 0 16px currentColor,
+      0 0 22px currentColor,
+      0 0 28px currentColor,
+      0 0 34px currentColor;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,1));
+  }
+}
+
+.animate-priority-glow {
+  animation: priority-glow 1.5s ease-in-out infinite;
+  font-weight: 900;
+  -webkit-text-stroke: 1px rgba(255,255,255,0.5);
+  text-stroke: 1px rgba(255,255,255,0.5);
 }
 
 

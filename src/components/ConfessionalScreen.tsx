@@ -8,13 +8,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Pillar, Action } from '@/lib/types';
 
-interface ConfessionalScreenProps {
+interface DiaryScreenProps {
   pillar: Pillar;
   topAction: Action;
   onComplete: () => void;
 }
 
-export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
+export const DiaryScreen: React.FC<DiaryScreenProps> = ({
   pillar,
   topAction,
   onComplete
@@ -59,7 +59,7 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
         return;
       }
 
-      // Salvar confessionário
+      // Salvar diário
       const { error } = await supabase
         .from('confessionals')
         .insert({
@@ -78,16 +78,16 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
 
       toast({
         title: "Sucesso",
-        description: "Confessionário finalizado com sucesso!",
+        description: "Diário finalizado com sucesso!",
       });
 
       onComplete();
 
     } catch (error) {
-      console.error('Erro ao salvar confessionário:', error);
+              console.error('Erro ao salvar diário:', error);
       toast({
         title: "Erro",
-        description: "Erro ao salvar confessionário",
+                  description: "Erro ao salvar diário",
         variant: "destructive",
       });
     } finally {
@@ -123,7 +123,7 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
             <Trophy className="w-10 h-10" />
           </div>
           <h1 className="font-poppins font-bold text-4xl md:text-5xl text-white text-glow">
-            🏆 CONFESSIONÁRIO ESTRATÉGICO
+                            📋 DIÁRIO ESTRATÉGICO
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium">
             Compartilhe sua justificativa para a escolha da ação prioritária
@@ -155,12 +155,12 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
           </CardContent>
         </Card>
 
-        {/* Pergunta do Confessionário */}
+                    {/* Pergunta do Diário */}
         <Card className="escape-run-card entrance-animation stagger-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-white">
               <Lightbulb className="w-6 h-6 text-unimed-orange" />
-              💡 PERGUNTA DO CONFESSIONÁRIO
+              💡 PERGUNTA DO DIÁRIO
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -192,7 +192,7 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
                 disabled={isSubmitting || !confession.trim()}
                 className="escape-run-button"
               >
-                {isSubmitting ? 'Enviando...' : 'Finalizar Confessionário'}
+                {isSubmitting ? 'Enviando...' : 'Finalizar Diário'}
               </Button>
             </div>
 
@@ -206,4 +206,4 @@ export const ConfessionalScreen: React.FC<ConfessionalScreenProps> = ({
   );
 };
 
-export default ConfessionalScreen;
+export default DiaryScreen;
