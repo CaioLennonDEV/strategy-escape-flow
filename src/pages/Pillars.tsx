@@ -152,7 +152,7 @@ const PillarsPage = () => {
                   CENTRO DE COMANDO
                 </h1>
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/90 max-w-3xl mx-auto font-medium leading-relaxed">
-                  Bem-vindo à sua jornada estratégica, <span className="font-bold text-unimed-light">{nickname}</span>. 
+                  Bem-vindo à sua jornada estratégica, <span className="font-bold text-unimed-light text-glow">{nickname}</span>. 
                   Escolha um pilar para começar sua missão.
                 </p>
               </div>

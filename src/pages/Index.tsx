@@ -155,15 +155,17 @@ const Index = () => {
                       🚀 INICIAR MISSÃO
                     </CardTitle>
                     <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
-                      Insira suas credenciais para acessar a jornada estratégica
+                      Digite o codigo da sala e seu nome para acessar a jornada estratégica
                     </p>
                   </CardHeader>
                   
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                       {error && (
-                        <div className="p-4 rounded-2xl bg-red-50 border-2 border-red-200 text-red-700 text-sm">
-                          ⚠️ {error}
+                        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-red-500/10 to-red-600/10 border-2 border-red-400/30 backdrop-blur-sm text-red-100 text-sm sm:text-base font-medium shadow-lg shadow-red-500/20">
+                          <div className="flex items-center gap-3">
+                            <span className="leading-relaxed">Ops! Aconteceu um erro: {error}</span>
+                          </div>
                         </div>
                       )}
 
@@ -189,10 +191,10 @@ const Index = () => {
                         <Input
                           id="nickname"
                           type="text"
-                          placeholder="Como você quer ser chamado?"
+                          placeholder="Como podemos te chamar?"
                           value={formData.nickname}
                           onChange={handleInputChange('nickname')}
-                          className="escape-run-input h-12 sm:h-14"
+                          className="escape-run-input terminal-font text-center text-base sm:text-lg tracking-wider h-12 sm:h-14"
                           maxLength={30}
                         />
                       </div>

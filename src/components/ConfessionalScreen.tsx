@@ -123,7 +123,7 @@ export const DiaryScreen: React.FC<DiaryScreenProps> = ({
             <Trophy className="w-10 h-10" />
           </div>
           <h1 className="font-poppins font-bold text-4xl md:text-5xl text-white text-glow">
-                            📋 DIÁRIO ESTRATÉGICO
+                            DIÁRIO ESTRATÉGICO
           </h1>
           <p className="text-xl text-white/90 max-w-2xl mx-auto font-medium">
             Compartilhe sua justificativa para a escolha da ação prioritária
@@ -135,18 +135,12 @@ export const DiaryScreen: React.FC<DiaryScreenProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center gap-3 text-white">
               <Crown className="w-6 h-6 text-unimed-orange" />
-              👑 SUAS ESCOLHAS
+              SUAS ESCOLHAS
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 rounded-xl bg-gradient-to-r from-unimed-support/10 to-unimed-info/10 border border-unimed-support/20">
-              <p className="text-unimed-primary text-sm font-semibold mb-1">🎯 Pilar Escolhido:</p>
-              <p className="text-white font-bold text-lg">{pillar.name}</p>
-              <p className="text-white/80 text-sm mt-1">{pillar.description}</p>
-            </div>
-            
             <div className="p-4 rounded-xl bg-gradient-to-r from-unimed-orange/10 to-unimed-primary/10 border border-unimed-orange/20">
-              <p className="text-unimed-orange text-sm font-semibold mb-1">🏆 Prioridade #1:</p>
+              <p className="text-unimed-orange text-sm font-semibold mb-1">Priorindade úmero 1:</p>
               <p className="text-white font-bold text-lg">{topAction.title}</p>
               {topAction.description && (
                 <p className="text-white/80 text-sm mt-1">{topAction.description}</p>
@@ -158,17 +152,18 @@ export const DiaryScreen: React.FC<DiaryScreenProps> = ({
                     {/* Pergunta do Diário */}
         <Card className="escape-run-card entrance-animation stagger-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-3 text-white">
-              <Lightbulb className="w-6 h-6 text-unimed-orange" />
-              💡 PERGUNTA DO DIÁRIO
+            <CardTitle className="flex items-center gap-2 text-white text-lg md:text-xl">
+              <Crown className="w-6 h-6 text-unimed-orange" />
+              <span className="flex flex-wrap items-center gap-x-1 w-full text-base md:text-lg">
+                Por que você colocou&nbsp;
+                <span className="text-unimed-orange font-bold">{topAction.title}</span>
+                &nbsp;em 1º lugar?
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 rounded-xl bg-gradient-to-r from-unimed-primary/5 to-unimed-light/5 border border-unimed-primary/20">
-              <p className="mb-2 text-white font-medium">
-                "Por que você colocou <span className="text-unimed-orange font-bold">'{topAction.title}'</span> em 1º lugar?"
-              </p>
-              <p className="text-white/80 text-sm">
+              <p className="text-white/80 text-xs md:text-sm">
                 Explique seu raciocínio estratégico. Que fatores considerou? Que impacto espera?
               </p>
             </div>
@@ -178,7 +173,7 @@ export const DiaryScreen: React.FC<DiaryScreenProps> = ({
                 placeholder="Digite aqui sua justificativa estratégica..."
                 value={confession}
                 onChange={(e) => setConfession(e.target.value)}
-                className="escape-run-input min-h-[200px] resize-none"
+                className="escape-run-input min-h-[100px] resize-none"
                 maxLength={500}
               />
               <div className="text-right text-sm text-white/60 font-medium">
@@ -194,10 +189,6 @@ export const DiaryScreen: React.FC<DiaryScreenProps> = ({
               >
                 {isSubmitting ? 'Enviando...' : 'Finalizar Diário'}
               </Button>
-            </div>
-
-            <div className="text-center text-white/60 text-sm mt-4 font-medium">
-              Suas respostas ajudarão a construir o futuro estratégico da Unimed
             </div>
           </CardContent>
         </Card>
