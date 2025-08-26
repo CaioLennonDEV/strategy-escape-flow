@@ -9,6 +9,8 @@ import { ArrowLeft, Zap, Target, Timer } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MissionConsole } from '@/components/MissionConsole';
 import { DiaryScreen } from '@/components/ConfessionalScreen';
+import { SimplePriorityDragDrop } from '@/components/SimplePriorityDragDrop';
+import { usePriorityDragDrop } from '@/hooks/use-priority-drag-drop';
 import type { Pillar, Action } from '@/lib/types';
 
 const PillarPage = () => {
@@ -20,6 +22,23 @@ const PillarPage = () => {
   const [showConfessional, setShowConfessional] = React.useState(false);
   const [topAction, setTopAction] = React.useState<Action | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [showDragDrop, setShowDragDrop] = React.useState(false);
+  
+  // Hook para gerenciar prioridades com drag and drop
+  const {
+    priorities,
+    hasPriorities,
+    prioritiesCount,
+    reorderPriorities,
+    setInitialPriorities,
+    clearPriorities
+  } = usePriorityDragDrop({
+    actions,
+    pillarId: pillarId || '',
+    onPrioritiesChange: (newPriorities) => {
+      console.log('Prioridades atualizadas:', newPriorities);
+    }
+  });
 
   // Gerar posições fixas para as bolinhas flutuantes
   const floatingElements = React.useMemo(() => {
@@ -281,7 +300,7 @@ const PillarPage = () => {
         <div className="p-3 sm:p-4 relative z-10">
           <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
             {/* Header */}
-            <div className="flex items-center gap-3 sm:gap-4 entrance-animation">
+            <div className="flex items-center justify-between gap-3 sm:gap-4 entrance-animation">
               <Button 
                 onClick={handleBack} 
                 className="text-sm sm:text-base px-4 sm:px-6 py-2.5 sm:py-3 font-bold transition-all duration-300"
@@ -307,6 +326,53 @@ const PillarPage = () => {
                 isCompleted={isCompleted}
               />
             </div>
+
+            {/* Drag and Drop Section */}
+            {showDragDrop && (
+              <div className="entrance-animation stagger-2">
+                <div className="bg-white/10 backdrop-blur-md rounded-lg p-6 border border-white/20">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-2xl font-bold text-white">
+                      Prioridades
+                    </h2>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={setInitialPriorities}
+                        className="text-xs px-3 py-1 bg-blue-600 hover:bg-blue-700"
+                      >
+                        Definir Todas
+                      </Button>
+                      <Button
+                        onClick={clearPriorities}
+                        className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700"
+                      >
+                        Limpar
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {hasPriorities ? (
+                    <SimplePriorityDragDrop
+                      priorities={priorities}
+                      onReorder={reorderPriorities}
+                      className="bg-transparent"
+                    />
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-white/60 text-sm mb-4">
+                        Clique em "Definir Todas" para começar a organizar as prioridades
+                      </p>
+                      <Button
+                        onClick={setInitialPriorities}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        Definir Prioridades
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

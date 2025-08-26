@@ -10,6 +10,7 @@ import PillarsPage from "./pages/Pillars";
 import PillarPage from "./pages/PillarPage";
 import Achievement from "./pages/Achievement";
 import NotFound from "./pages/NotFound";
+import { SimplePriorityExample } from "./components/examples/SimplePriorityExample";
 
 import "./App.css";
 
@@ -37,6 +38,7 @@ const App = () => {
               <Route path="/pillars" element={<PillarsPage />} />
               <Route path="/pilar/:pillarId" element={<PillarPage />} />
               <Route path="/achievement" element={<Achievement />} />
+              <Route path="/simple-priority-example" element={<SimplePriorityExample />} />
 
               <Route path="*" element={<NotFound />} />
             </Routes>

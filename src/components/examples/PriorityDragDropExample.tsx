@@ -1,5 +1,5 @@
 import React from 'react';
-import { SimplePriorityDragDrop } from '../SimplePriorityDragDrop';
+import { PriorityDragDrop } from '../PriorityDragDrop';
 import { usePriorityDragDrop } from '../../hooks/use-priority-drag-drop';
 
 // Dados de exemplo
@@ -36,7 +36,7 @@ const mockActions = [
   }
 ];
 
-export const SimplePriorityExample: React.FC = () => {
+export const PriorityDragDropExample: React.FC = () => {
   const {
     priorities,
     hasPriorities,
@@ -56,7 +56,7 @@ export const SimplePriorityExample: React.FC = () => {
       <div className="bg-white/10 backdrop-blur-md rounded-lg p-8 border border-white/20 max-w-md w-full">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-white">
-            Prioridades Simples
+            Prioridades
           </h2>
           <div className="flex gap-2">
             <button
@@ -75,7 +75,7 @@ export const SimplePriorityExample: React.FC = () => {
         </div>
         
         {hasPriorities ? (
-          <SimplePriorityDragDrop
+          <PriorityDragDrop
             priorities={priorities}
             onReorder={reorderPriorities}
           />
@@ -95,6 +95,4 @@ export const SimplePriorityExample: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default SimplePriorityExample; 
+}; 
